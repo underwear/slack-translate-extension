@@ -1,44 +1,40 @@
 {
-	"manifest_version": 3,
-  "name": "Translate for Slack",
-	"short_name": "Translate for Slack",
-	"description": "Translate Slack message directly in the Slack web app.",
-	"version": "1.0.6",
-	"offline_enabled": false,
-	"content_scripts": [
-		{
-			"matches": [
-				"https://app.slack.com/client/*"
-			],
-			"js": [
-				"content.js"
-			],
-			"css": [
-				"style.css"
-			],
-			"run_at": "document_idle",
-			"all_frames": false
-		}
-	],
-	"host_permissions": [
-		"https://app.slack.com/client/*"
-	],
-	"icons": {
-		"16": "icons/16.png",
-		"48": "icons/48.png",
+  "manifest_version": 3,
+  "name": "Slack Local AI",
+  "short_name": "Slack Local AI",
+  "description": "Translate incoming messages and rewrite outgoing ones in English — fully on-device via Chrome built-in AI.",
+  "version": "2.0.0",
+  "offline_enabled": true,
+  "minimum_chrome_version": "138",
+  "content_scripts": [
+    {
+      "matches": ["https://app.slack.com/client/*"],
+      "js": ["content.js"],
+      "css": ["style.css"],
+      "run_at": "document_idle",
+      "all_frames": false
+    },
+    {
+      "matches": ["https://app.slack.com/client/*"],
+      "js": ["ai-runner.js"],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": false
+    }
+  ],
+  "host_permissions": ["https://app.slack.com/client/*"],
+  "icons": {
+    "16": "icons/16.png",
+    "48": "icons/48.png",
     "128": "icons/128.png"
-	},
-	"options_page": "options.html",
-	"permissions": [
-		"storage"
-	],
-	"action": {
-		"default_title": "Options",
-		"default_icon": {
-			"128": "icons/logo.png"
-		}
-	},
-	"background": {
+  },
+  "options_page": "options.html",
+  "permissions": ["storage"],
+  "action": {
+    "default_title": "Options",
+    "default_icon": { "128": "icons/logo.png" }
+  },
+  "background": {
     "service_worker": "background.js"
-	}
+  }
 }

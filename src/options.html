@@ -1,115 +1,103 @@
+<!doctype html>
 <html>
+<head>
   <meta charset="UTF-8">
-  <title>Settings - Translate for Slack</title>
+  <title>Settings — Slack Local AI</title>
   <link rel="shortcut icon" href="/icons/favicon.ico" type="image/x-icon">
   <link rel="icon" href="/icons/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="./options.css">
+</head>
+<body>
   <header>
-    <img src="./icons/48.png" />
-    <h1>Settings - Translate for Slack</h1>
+    <img src="./icons/48.png" alt="">
+    <h1>Slack Local AI — Settings</h1>
   </header>
   <div class="content">
     <div class="section">
-      <h2 class="header">Translate Settings</h2>
+      <h2 class="header">Translation</h2>
       <div class="card">
         <div class="card-row">
-          <div class="flex">Translate From</div>
-          <select name="translate-from" id="translate-from-dropdown">
-            <option value="auto" id="from-auto" selected>Auto Detect</option>
-          </select>
-        </div>
-        <div class="card-row">
-          <div class="flex">Translate To</div>
-          <select name="translate-to" id="translate-to-dropdown"></select>
-        </div>
-      </div>
-    </div>
-    <div class="section">
-      <h2 class="header">Advanced Settings</h2>
-      <div class="card">
-        <div class="card-row">
-          <div class="flex">(Optional) Translate Button Label</div>
-          <input id="translate-label" type="text" />
+          <div class="flex">
+            <div>Your native language</div>
+            <div class="sub">Incoming messages are translated into this language. Source language is detected automatically.</div>
+          </div>
+          <select id="native-language-dropdown"></select>
         </div>
         <div class="card-row">
           <div class="flex">
-            <span>(Optional) Only Show Translate Button If Regex Is Matched</span>
-            <span class="learn-more" id="show-regex-card"><br />Learn more</span>
+            <div>Translate button label</div>
+            <div class="sub">Text shown under each foreign message.</div>
           </div>
-          <input id="translate-regex" type="text" />
-        </div>
-        <div class="regex-card" hidden>
-          <div class="title"><b>Examples of Regex:</b></div>
-          <div><code>/([\u0e00-\u0e7f])/</code> : Show translate button if Thai character is found</div>
-          <div><code>/([\u1100-\u11ff])/</code> : Show translate button if Korean character is found</div>
-          <div><code>/([\u0b80-\u0bfe])/</code> : Show translate button if Tamil character is found</div>
-          <div><code>/([\u4e00-\u9fbf\u3040-\u309f\u30a0-\u30ff])/</code> : Show translate button if Japanese character is found</div>
-          <div class="more">More examples: <a
-            href="https://apps.timwhitlock.info/js/regex"
-            target="_blank"
-            rel="noopener noreferrer"
-          >apps.timwhitlock.info/js/regex</a></div>
+          <input id="translate-label" type="text" />
         </div>
       </div>
     </div>
+
     <div class="section">
-      <h2 class="header">Reset Settings</h2>
+      <h2 class="header">Models <button id="refresh-status" class="link-btn" type="button">refresh</button></h2>
+      <div class="card" id="models-card">
+        <div class="card-row">
+          <div class="flex">
+            <div>Status</div>
+            <div class="sub" id="models-overall-sub">Loading…</div>
+          </div>
+          <button id="prefetch-btn" type="button">Download models</button>
+        </div>
+        <div id="model-rows"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="header">Composer</h2>
       <div class="card">
         <div class="card-row">
-          <div class="flex">Restore settings to their original defaults</div>
-          <button id="translate-reset">Reset</button>
+          <div class="flex">
+            <div>Show "Rewrite in English" button</div>
+            <div class="sub">Adds ✨ next to Send. Translates non-English to English, or polishes your English.</div>
+          </div>
+          <label class="switch">
+            <input id="rewrite-enabled" type="checkbox">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="card-row prompt-row">
+          <div class="flex">
+            <div>Rewrite prompt
+              <button id="reset-prompt-btn" class="link-btn" type="button">reset to default</button>
+            </div>
+            <div class="sub">Instructions given to Gemini Nano. The original message is appended after these instructions. Falls back to plain Translator API if Gemini Nano isn't installed.</div>
+            <textarea id="rewrite-prompt" rows="10" spellcheck="false"></textarea>
+          </div>
         </div>
       </div>
     </div>
+
     <div class="section">
-      <h2 class="header">About Translate for Slack</h2>
+      <h2 class="header">Reset</h2>
+      <div class="card">
+        <div class="card-row">
+          <div class="flex">Restore defaults</div>
+          <button id="reset-btn">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="header">About</h2>
       <div class="card">
         <div class="card-row about">
-          <img src="./icons/48.png">
+          <img src="./icons/48.png" alt="">
           <div>
-            <div>Translate for Slack</div>
-            <div class="version">Version 1.0.6</div>
+            <div>Slack Local AI</div>
+            <div class="version">Version 2.0.0 · 100% on-device · powered by Chrome built-in AI</div>
           </div>
         </div>
-        <a
-          class="card-row"
-          href="https://chrome.google.com/webstore/detail/translate-for-slack/dhadelkabablecjhglpdnjbigkcdfdlm"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <div class="flex">Rate Translate for Slack on Chrome Web Store</div>
-          <img class="more" src="./icons/more.svg" />
-        </a>
-        <a
-          class="card-row"
-          href="https://twitter.com/henrylim96"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <div class="flex">Follow Henry Lim on Twitter</div>
-          <img class="more" src="./icons/more.svg" />
-        </a>
-        <a
-          class="card-row"
-          href="https://www.paypal.me/henrylim96"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <div class="flex">Donate to Henry Lim via PayPal</div>
-          <img class="more" src="./icons/more.svg" />
-        </a>
-        <a
-          class="card-row"
-          href="https://github.com/limhenry/slack-translate-extension"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <div class="flex">View Source Code on GitHub</div>
-          <img class="more" src="./icons/more.svg" />
+        <a class="card-row" href="https://developer.chrome.com/docs/ai/built-in" target="_blank" rel="noopener noreferrer">
+          <div class="flex">About Chrome built-in AI</div>
         </a>
       </div>
     </div>
   </div>
+  <script src="./options.js"></script>
+</body>
 </html>
-
-<script src="./options.js"></script>

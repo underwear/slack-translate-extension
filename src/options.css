@@ -191,3 +191,115 @@ header h1 {
 .section .card .card-row.about img {
   height: 44px;
 }
+
+/* secondary description under an option title */
+.section .card .card-row .sub {
+  font-size: 12px;
+  color: #9aa0a6;
+  margin-top: 2px;
+  max-width: 480px;
+}
+
+/* iOS-style toggle */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.switch .slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #9aa0a6;
+  border-radius: 22px;
+  transition: background-color .2s;
+}
+.switch .slider::before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  top: 2px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform .2s;
+}
+.switch input:checked + .slider {
+  background-color: var(--primary-accent-color);
+}
+.switch input:checked + .slider::before {
+  transform: translateX(18px);
+}
+
+/* models status section */
+.section h2 .link-btn {
+  background: none;
+  border: none;
+  color: var(--primary-accent-color);
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: 8px;
+  padding: 0;
+  text-decoration: underline;
+}
+.model-row .status {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: rgba(154, 160, 166, 0.2);
+}
+.model-row .status.ok { background: rgba(34, 139, 88, 0.18); color: #1f8f55; }
+.model-row .status.busy { background: rgba(26, 115, 232, 0.18); color: var(--primary-accent-color); }
+.model-row .status.warn { background: rgba(255, 167, 38, 0.18); color: #c77a00; }
+.model-row .status.err { background: rgba(211, 47, 47, 0.18); color: var(--error-color); }
+.progress {
+  margin-top: 6px;
+  height: 4px;
+  width: 200px;
+  background: rgba(154, 160, 166, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  background: var(--primary-accent-color);
+  transition: width .25s;
+}
+.sub.err { color: var(--error-color); }
+.sub code {
+  background: rgba(154, 160, 166, 0.2);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+/* textarea for the rewrite prompt */
+.card-row.prompt-row {
+  grid-template-columns: 1fr;
+}
+.card-row.prompt-row textarea {
+  margin-top: 8px;
+  width: 100%;
+  background: var(--dropdown-background-color);
+  color: var(--primary-text-color);
+  border: 1px solid var(--button-border-color);
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 120px;
+}
+.card-row.prompt-row textarea:focus {
+  outline: none;
+  border-color: var(--primary-accent-color);
+}

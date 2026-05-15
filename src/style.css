@@ -1,31 +1,57 @@
-.___sgt-translate-button {
+/* Translate button under incoming messages */
+.sla-translate-btn {
   margin: 4px 0;
-  opacity: 0.8;
+  opacity: 0.7;
   font-size: 0.9em;
   cursor: pointer;
+  user-select: none;
 }
-
-.___sgt-translate-button:hover {
+.sla-translate-btn:hover {
+  opacity: 1;
   text-decoration: underline;
 }
+.sla-translate-btn[data-error] {
+  color: #d9534f;
+  opacity: 1;
+}
 
-.___sgt-translate-button[data-translate-done] {
+/* Translated result — gray quote bar on the left */
+.sla-translate-done {
   margin: 6px 0;
-  font-size: 1em; 
-  cursor: default;
   padding-left: 10px;
-  border-left: 3px solid rgba(var(--sk_primary_foreground,29,28,29),1);
+  border-left: 3px solid rgba(var(--sk_primary_foreground, 29, 28, 29), 1);
   white-space: pre-line;
 }
 
-.___sgt-translate-button[data-translate-done]:hover {
-  text-decoration: none;
+/* Rewrite-in-English button in composer suffix (sits left of Send) */
+.sla-rewrite-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-right: 4px;
+  border-radius: 4px;
+  cursor: pointer;
 }
-
-.___sgt-translate-attribution,
-.___sgt-translate-attribution:hover {
-  display: flex;
-  margin-top: 8px;
-  text-decoration: none;
-  color: inherit;
+.sla-rewrite-btn:hover {
+  background: rgba(var(--sk_foreground_low_solid, 29, 28, 29), 0.08);
+}
+.sla-rewrite-btn[disabled] {
+  cursor: progress;
+  opacity: 0.5;
+}
+.sla-rewrite-btn[data-loading] .sla-rewrite-icon {
+  animation: sla-spin 1s linear infinite;
+  display: inline-block;
+}
+.sla-rewrite-btn[data-error] {
+  background: rgba(217, 83, 79, 0.15);
+}
+.sla-rewrite-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+@keyframes sla-spin {
+  to { transform: rotate(360deg); }
 }
