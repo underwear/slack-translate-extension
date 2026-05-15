@@ -13,6 +13,49 @@
   // "use ## delimiters" guidance for Nano, with 2 few-shot examples (1 numbered
   // list, 1 prose) — small models follow the closest example by shape, more than
   // 2-3 leads to mimicry/overfitting.
+  // Translate prompt — preserves formatting (lists, paragraphs, mentions). Used as the
+  // primary path for incoming-message translation because Translator API mangles
+  // multi-paragraph structure. Target language is filled in per call.
+  const TRANSLATE_PROMPT = (targetName) => `You are a translator inside a Slack client.
+Translate the user's message into ${targetName}.
+
+## Rules
+- Translate accurately and naturally — sound like a native ${targetName} speaker writing on Slack.
+- PRESERVE FORMATTING EXACTLY: line breaks, blank lines between paragraphs, numbered lists ("1." "2."), bulleted lists ("-"), and the position of each item.
+- Preserve character-for-character: @mentions (@name), #channel refs, URLs, inline code in \`backticks\`, fenced code blocks in triple backticks, and any product/code identifiers (V1, V2, ASAP, MVP, API names).
+- Output ONLY the translated text. No preface, no quotes, no explanations, no "Here is the translation".
+
+## Examples
+
+Input:
+This is kind of the roadmap:
+1. Subscription AI video + image (standalone) need this asap
+2. Subscription + AI Video + image + Zendrop bundle
+3. Subscription + AI Video + image + Avatars
+
+Output:
+Это что-то вроде дорожной карты:
+1. Subscription AI video + image (отдельно) — нужно это ASAP
+2. Subscription + AI Video + image + Zendrop bundle
+3. Subscription + AI Video + image + Avatars
+
+Input:
+Quick question — the API is returning 500 on \`/users\`, see https://example.com/logs/123. I think it's the new migration. cc @alex
+
+Output:
+Быстрый вопрос — API возвращает 500 на \`/users\`, см. https://example.com/logs/123. Думаю, дело в новой миграции. cc @alex`;
+
+  // Friendly target-language names for the translate prompt
+  const LANG_NAMES = {
+    ru: 'Russian', en: 'English', es: 'Spanish', fr: 'French', de: 'German', it: 'Italian',
+    pt: 'Portuguese', pl: 'Polish', uk: 'Ukrainian', tr: 'Turkish', nl: 'Dutch', sv: 'Swedish',
+    fi: 'Finnish', da: 'Danish', no: 'Norwegian', cs: 'Czech', sk: 'Slovak', ro: 'Romanian',
+    hu: 'Hungarian', bg: 'Bulgarian', el: 'Greek', he: 'Hebrew', ar: 'Arabic', fa: 'Persian',
+    hi: 'Hindi', bn: 'Bengali', th: 'Thai', vi: 'Vietnamese', id: 'Indonesian', ms: 'Malay',
+    ja: 'Japanese', ko: 'Korean', 'zh-CN': 'Simplified Chinese', 'zh-TW': 'Traditional Chinese',
+  };
+  const langName = (code) => LANG_NAMES[code] || code;
+
   const DEFAULT_REWRITE_PROMPT = `You are a rewriting assistant inside a Slack composer for a US tech company.
 Your only job: rewrite the user's draft into clear, casual-but-professional English suitable for coworker chat.
 
@@ -90,10 +133,12 @@ Quick question — the API is returning 500 on \`/users\`, see https://example.c
         temperature: 0.3,
         topK: 3,
       };
+      // We don't declare expectedOutputs.languages because Nano may need to emit
+      // many possible target languages (translate handler). Some builds also reject
+      // expectedInputs.languages entirely — fall back without them on NotSupportedError.
       const session = LanguageModel.create({
         ...base,
         expectedInputs: [{ type: 'text', languages: ['ru', 'en'] }],
-        expectedOutputs: [{ type: 'text', languages: ['en'] }],
       }).catch((err) => {
         if (err?.name === 'NotSupportedError' || /language options/i.test(err?.message || '')) {
           console.warn('[slack-local-ai] expectedInputs languages unsupported, retrying without them');
@@ -135,15 +180,31 @@ Quick question — the API is returning 500 on \`/users\`, see https://example.c
       };
     },
 
-    async translate({ text, targetLanguage }) {
+    // engine: 'translator' (default, high-quality but flattens formatting)
+    //       | 'nano'       (Gemini Nano, preserves lists/paragraphs, lower translation quality)
+    async translate({ text, targetLanguage, engine }) {
       const detected = await detectLang(text);
       if (!detected || !detected.detectedLanguage) throw new Error('Cannot detect source language');
       if (detected.detectedLanguage === targetLanguage) {
         return { text, sourceLanguage: detected.detectedLanguage, skipped: true };
       }
+
+      const useNano = engine === 'nano' && 'LanguageModel' in window;
+
+      if (useNano) {
+        try {
+          const session = await getModel(TRANSLATE_PROMPT(langName(targetLanguage)));
+          const userTurn = `Translate the message below into ${langName(targetLanguage)}. Output only the translation.\n\n<message>\n${text}\n</message>`;
+          const out = await session.prompt(userTurn);
+          return { text: cleanOutput(out), sourceLanguage: detected.detectedLanguage, mode: 'nano' };
+        } catch (err) {
+          console.warn('[slack-local-ai] Nano translate failed, falling back to Translator API', err);
+        }
+      }
+
       const translator = await getTranslator(detected.detectedLanguage, targetLanguage);
       const translated = await translator.translate(text);
-      return { text: translated, sourceLanguage: detected.detectedLanguage };
+      return { text: translated, sourceLanguage: detected.detectedLanguage, mode: 'translator' };
     },
 
     async rewriteEnglish({ text, prompt }) {

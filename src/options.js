@@ -61,11 +61,13 @@ Quick question — the API is returning 500 on \`/users\`, see https://example.c
 const DEFAULTS = {
   nativeLanguage: 'ru',
   translateLabel: 'Translate',
+  translateEngine: 'translator',
   rewriteEnabled: true,
   rewritePrompt: DEFAULT_REWRITE_PROMPT,
 };
 
 const nativeSelect = document.querySelector('#native-language-dropdown');
+const engineSelect = document.querySelector('#translate-engine');
 const labelInput = document.querySelector('#translate-label');
 const rewriteToggle = document.querySelector('#rewrite-enabled');
 const rewritePrompt = document.querySelector('#rewrite-prompt');
@@ -271,6 +273,7 @@ const populateLanguages = () => {
 const loadConfig = () => {
   chrome.storage.sync.get(DEFAULTS, (cfg) => {
     nativeSelect.value = cfg.nativeLanguage;
+    engineSelect.value = cfg.translateEngine;
     labelInput.value = cfg.translateLabel;
     rewriteToggle.checked = !!cfg.rewriteEnabled;
     rewritePrompt.value = cfg.rewritePrompt || DEFAULT_REWRITE_PROMPT;
@@ -283,6 +286,7 @@ populateLanguages();
 loadConfig();
 
 nativeSelect.addEventListener('change', (e) => set('nativeLanguage', e.target.value));
+engineSelect.addEventListener('change', (e) => set('translateEngine', e.target.value));
 labelInput.addEventListener('blur', (e) => set('translateLabel', e.target.value || DEFAULTS.translateLabel));
 rewriteToggle.addEventListener('change', (e) => set('rewriteEnabled', e.target.checked));
 rewritePrompt.addEventListener('blur', (e) => set('rewritePrompt', e.target.value.trim() || DEFAULT_REWRITE_PROMPT));

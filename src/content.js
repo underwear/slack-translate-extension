@@ -25,6 +25,8 @@ const SELECTORS = {
 const DEFAULT_CONFIG = {
   nativeLanguage: 'ru', // your mother tongue — used as target for incoming translations
   translateLabel: 'Translate',
+  translateEngine: 'translator', // 'translator' — better quality, flattens formatting
+                                 // 'nano'       — Gemini Nano, preserves lists & line breaks
   rewriteEnabled: true,
   rewritePrompt: '', // empty = use ai-runner default
 };
@@ -96,6 +98,7 @@ const injectTranslateButton = (messageEl) => {
         const { text: translated, skipped, sourceLanguage } = await callAiRunner('translate', {
           text,
           targetLanguage: config.nativeLanguage,
+          engine: config.translateEngine,
         });
         const done = document.createElement('div');
         done.className = CLS.translateDone;

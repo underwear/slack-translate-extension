@@ -25,6 +25,16 @@
         </div>
         <div class="card-row">
           <div class="flex">
+            <div>Translation engine</div>
+            <div class="sub">Translator: better translation quality, but flattens lists and paragraphs into one block of text.<br>Gemini Nano: lower-quality translation, but preserves numbered/bulleted lists, line breaks, @mentions and URLs.</div>
+          </div>
+          <select id="translate-engine">
+            <option value="translator">Translator API (default)</option>
+            <option value="nano">Gemini Nano (keep formatting)</option>
+          </select>
+        </div>
+        <div class="card-row">
+          <div class="flex">
             <div>Translate button label</div>
             <div class="sub">Text shown under each foreign message.</div>
           </div>
